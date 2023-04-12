@@ -1,1 +1,129 @@
-<h1>Welcome tu this site!</h1>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Get YouTube Video</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      
+      header {
+        background-color: #333;
+        color: #fff;
+        padding: 10px;
+        text-align: center;
+      }
+      
+      h1 {
+        margin: 0;
+      }
+      
+      main {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        justify-content: center;
+      }
+      
+      form {
+        align-self: center;
+        background-color: #fff;
+        border: 1px solid #333;
+        border-radius: 4px;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        width: 400px;
+      }
+      
+      label {
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      
+      input[type="text"] {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+        padding: 10px;
+      }
+      
+      button[type="submit"] {
+        background-color: #333;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+        padding: 10px;
+      }
+      
+      button[type="submit"]:hover {
+        background-color: #444;
+      }
+      
+      #videoContainer {
+        align-self: center;
+        margin-top: 20px;
+        width: 640px;
+      }
+      
+      iframe {
+        border: none;
+        height: 360px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Get YouTube Video</h1>
+    </header>
+    
+    <main>
+      <form id="urlForm">
+        <label for="urlInput">Enter YouTube Video URL:</label>
+        <input type="text" id="urlInput" name="urlInput" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+        <button type="submit">Get Video</button>
+      </form>
+      
+      <div id="videoContainer"></div>
+    </main>
+    
+    <script>
+      const urlForm = document.querySelector('#urlForm');
+      
+      urlForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        const urlInput = document.querySelector('#urlInput');
+        const url = urlInput.value.trim();
+        
+        // Make sure the URL is a valid YouTube video URL
+        if (!/^https?:\/\/(www\.)?youtube\.com\/watch\?v=.+$/.test(url)) {
+          alert('Please enter a valid YouTube video URL.');
+          return;
+        }
+        
+        const videoId = url.match(/v=([^&]+)/)[1];
+        const videoUrl = `https://www.youtube.com/embed/${videoId}`;
+        
+        const iframe = document.createElement('iframe');
+        iframe.src = videoUrl;
+        iframe.width = 640;
+        iframe.height = 360;
+        iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        
+       const videoContainer = document.querySelector('#videoContainer');
+videoContainer.innerHTML = '';
+videoContainer.appendChild(iframe);
+});
+</script>
+
+  </body>
+</html>
