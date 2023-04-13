@@ -1,5 +1,29 @@
 {{template "header" .}}
-<div class="px-6">
-  <h1 class="py-4 text-4xl semibold tracking-tight">Welcome to my site</h1>
-</div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload JavaScript with Progress Ba | CodingNepal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+</head>
+<body class="bg-blue-500">
+  <div class="flex items-center justify-center min-h-screen">
+    <div class="w-96 bg-white rounded-lg shadow-md p-6 font-sans">
+      <header class="text-blue-500 font-semibold text-center text-2xl">File Uploader JavaScript</header>
+      <form class="h-44 cursor-pointer flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-blue-500 my-6">
+        <input class="file-input hidden" type="file" name="file">
+        <i class="fas fa-cloud-upload-alt text-blue-500 text-6xl"></i>
+        <button type="submit" class="w-48 py-2 px-1 bg-indigo-600
+                hover:bg-indigo-700 text-white rounded font-bold text-base">
+                <div class="px-1">
+                  CHOOSE VIDEO
+                </div>
+          </button>
+      </form>
+      <section class="progress-area"></section>
+      <section class="uploaded-area"></section>
+    </div>
+  </div>
+</body>
+</html>
 {{template "footer" .}}
