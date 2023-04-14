@@ -62,22 +62,32 @@ func main() {
 	}
 	fmt.Println("Tables created.")
 
-	// Insert some data..
-	name := "',''); DROP TABLE users; --"
-	email := "shreyok@shrey.com"
-	query := fmt.Sprintf(`
-		INSERT INTO users (name, email)
-		VALUES('%s', '%s')
-		`, name, email)
-	fmt.Printf("Executing: %s\n", query)
-	_, err = db.Exec(query)
 	/*
-		_, err = db.Exec(`
-		INSERT INTO users (name, email)
-		VALUES ($1, $2);`, name, email)
+		// Insert some data..
+		name := "Shrey DAMN"
+		email := "shreyDamn@shrey.com"
+
+		row := db.QueryRow(`
+				INSERT INTO users (name, email)
+				VALUES ($1, $2) RETURNING id;`, name, email)
+		row.Err()
+		var id int
+		err = row.Scan(&id)
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println("User created! id =", id)
 	*/
-	fmt.Println("User created!")
+
+	id := 1
+	row := db.QueryRow(`
+		SELECT name, email
+		FROM users
+		WHERE id=$1;`, id)
+	var name, email string
+	err = row.Scan(&name, &email)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("User information: name=%s, email=%s\n", name, email)
 }
