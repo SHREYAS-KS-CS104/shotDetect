@@ -63,13 +63,21 @@ func main() {
 	fmt.Println("Tables created.")
 
 	// Insert some data..
-	name := "Shrey"
-	email := "shrey@shrey.com"
-	_, err = db.Exec(`
-	INSERT INTO users (name, email)
-	VALUES ($1, $2);`, name, email)
-	if err != nil {
-		panic(err)
-	}
+	name := "',''); DROP TABLE users; --"
+	email := "shreyok@shrey.com"
+	query := fmt.Sprintf(`
+		INSERT INTO users (name, email)
+		VALUES('%s', '%s')
+		`, name, email)
+	fmt.Printf("Executing: %s\n", query)
+	_, err = db.Exec(query)
+	/*
+		_, err = db.Exec(`
+		INSERT INTO users (name, email)
+		VALUES ($1, $2);`, name, email)
+		if err != nil {
+			panic(err)
+		}
+	*/
 	fmt.Println("User created!")
 }
