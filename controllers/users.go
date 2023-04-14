@@ -9,7 +9,8 @@ import (
 
 type Users struct {
 	Templates struct {
-		New Template
+		New   Template
+		LogIn Template
 	}
 	UserService *models.UserService
 }
@@ -32,4 +33,12 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "User created: %+v", user)
+}
+
+func (u Users) LogIn(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		Email string
+	}
+	data.Email = r.FormValue("email")
+	u.Templates.LogIn.Execute(w, data)
 }
