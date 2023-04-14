@@ -1,47 +1,37 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 
-	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/SHREYAS-KS-CS104/shotDetect/models"
 )
 
-type PostgresConfig struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Database string
-	SSLMode  string
-}
-
-func (cfg PostgresConfig) String() string {
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database, cfg.SSLMode)
-}
-
 func main() {
-	cfg := PostgresConfig{
-		Host:     "localhost",
-		Port:     "5432",
-		User:     "shrey",
-		Password: "12345678",
-		Database: "shotdetect",
-		SSLMode:  "disable",
-	}
-
-	db, err := sql.Open("pgx", cfg.String())
+	cfg := models.DefaultPostgresConfig()
+	db, err := models.Open(cfg)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
+
 	err = db.Ping()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("Connected!")
 
+	us := models.UserService{
+		DB: db,
+	}
+
+	user, err := us.Create("shreyOK@shrey.com", "shrey OK")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(user)
+}
+
+/*
 	// Create a table...
 	_, err = db.Exec(`
 	CREATE TABLE IF NOT EXISTS users (
@@ -61,49 +51,52 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("Tables created.")
+*/
 
-	/*
-		// Insert some data..
-		name := "Shrey DAMN"
-		email := "shreyDamn@shrey.com"
+/*
+	// Insert some data..
+	name := "Shrey DAMN"
+	email := "shreyDamn@shrey.com"
 
-		row := db.QueryRow(`
-				INSERT INTO users (name, email)
-				VALUES ($1, $2) RETURNING id;`, name, email)
-		row.Err()
-		var id int
-		err = row.Scan(&id)
+	row := db.QueryRow(`
+			INSERT INTO users (name, email)
+			VALUES ($1, $2) RETURNING id;`, name, email)
+	row.Err()
+	var id int
+	err = row.Scan(&id)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("User created! id =", id)
+*/
+/*
+	id := 1
+	row := db.QueryRow(`
+		SELECT name, email
+		FROM users
+		WHERE id=$1;`, id)
+	var name, email string
+	err = row.Scan(&name, &email)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("User information: name=%s, email=%s\n", name, email)
+
+	userID := 1
+	for i := 1; i <= 5; i++ {
+		amount := i * 100
+		desc := fmt.Sprintf("Fake order #%d", i)
+		_, err := db.Exec(`
+			INSERT INTO orders(user_id, amount, description)
+			VALUES($1,$2,$3)`, userID, amount, desc)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("User created! id =", id)
-	*/
-	/*
-		id := 1
-		row := db.QueryRow(`
-			SELECT name, email
-			FROM users
-			WHERE id=$1;`, id)
-		var name, email string
-		err = row.Scan(&name, &email)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("User information: name=%s, email=%s\n", name, email)
+	}
+	fmt.Println("Created fake orders")
+*/
 
-		userID := 1
-		for i := 1; i <= 5; i++ {
-			amount := i * 100
-			desc := fmt.Sprintf("Fake order #%d", i)
-			_, err := db.Exec(`
-				INSERT INTO orders(user_id, amount, description)
-				VALUES($1,$2,$3)`, userID, amount, desc)
-			if err != nil {
-				panic(err)
-			}
-		}
-		fmt.Println("Created fake orders")
-	*/
+/*
 	type Order struct {
 		ID          int
 		UserID      int
@@ -136,3 +129,4 @@ func main() {
 
 	fmt.Println("Orders:", orders)
 }
+*/
