@@ -56,5 +56,11 @@ func (u Users) ProcessLogIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid Log in", http.StatusInternalServerError)
 		return
 	}
+	cookie := http.Cookie{
+		Name:  "email",
+		Value: user.Email,
+		Path:  "/",
+	}
+	http.SetCookie(w, &cookie)
 	fmt.Fprintf(w, "User authenticated: %+v", user)
 }
