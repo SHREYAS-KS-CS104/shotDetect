@@ -12,7 +12,8 @@ type Users struct {
 		New   Template
 		LogIn Template
 	}
-	UserService *models.UserService
+	UserService    *models.UserService
+	SessionService *models.SessionService
 }
 
 func (u Users) New(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +33,22 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintf(w, "User created: %+v", user)
+	session, err := u.SessionService.Create(user.ID)
+	if err != nil {
+		fmt.Println(err)
+		//TODO: Long term, we should show a warning about not being able to sign
+		// the user in.
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+	cookie := http.Cookie{
+		Name:     "seesion",
+		Value:    session.Token,
+		Path:     "/",
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
 
 func (u Users) LogIn(w http.ResponseWriter, r *http.Request) {
@@ -56,22 +72,35 @@ func (u Users) ProcessLogIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid Log in", http.StatusInternalServerError)
 		return
 	}
+	session, err := u.SessionService.Create(user.ID)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Invalid Log in", http.StatusInternalServerError)
+		return
+	}
 	cookie := http.Cookie{
-		Name:     "email",
-		Value:    user.Email,
+		Name:     "session",
+		Value:    session.Token,
 		Path:     "/",
 		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)
-	fmt.Fprintf(w, "User authenticated: %+v", user)
+	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
 
 func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
-	email, err := r.Cookie("email")
+	tokenCookie, err := r.Cookie("session")
 	if err != nil {
-		fmt.Fprint(w, "The email cookie not be read")
+		fmt.Println(err)
+		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
-	fmt.Fprintf(w, "Email cookie: %s\n", email.Value)
-	fmt.Fprintf(w, "Headers: %+v\n", r.Header)
+
+	user, err := u.SessionService.User(tokenCookie.Value)
+	if err != nil {
+		fmt.Println(err)
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+	fmt.Fprintf(w, "Current user %s\n", user.Email)
 }
