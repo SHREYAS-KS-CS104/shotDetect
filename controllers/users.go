@@ -20,7 +20,7 @@ func (u Users) New(w http.ResponseWriter, r *http.Request) {
 		Email string
 	}
 	data.Email = r.FormValue("email")
-	u.Templates.New.Execute(w, data)
+	u.Templates.New.Execute(w, r, data)
 }
 
 func (u Users) Create(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +40,7 @@ func (u Users) LogIn(w http.ResponseWriter, r *http.Request) {
 		Email string
 	}
 	data.Email = r.FormValue("email")
-	u.Templates.LogIn.Execute(w, data)
+	u.Templates.LogIn.Execute(w, r, data)
 }
 
 func (u Users) ProcessLogIn(w http.ResponseWriter, r *http.Request) {

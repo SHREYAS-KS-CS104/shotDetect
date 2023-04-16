@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/SHREYAS-KS-CS104/shotDetect/controllers"
@@ -13,16 +12,17 @@ import (
 	"github.com/gorilla/csrf"
 )
 
-func executeTemplate(w http.ResponseWriter, filepath string) {
-	t, err := views.Parse(filepath)
-	if err != nil {
-		log.Printf("parsing templates: %v", err)
-		http.Error(w, "There was an erro parsing the template", http.StatusInternalServerError)
-		return
+/*
+	func executeTemplate(w http.ResponseWriter, filepath string) {
+		t, err := views.Parse(filepath)
+		if err != nil {
+			log.Printf("parsing templates: %v", err)
+			http.Error(w, "There was an error parsing the template", http.StatusInternalServerError)
+			return
+		}
+		t.Execute(w, r, nil)
 	}
-	t.Execute(w, nil)
-}
-
+*/
 func main() {
 	r := chi.NewRouter()
 
