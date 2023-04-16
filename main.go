@@ -10,6 +10,7 @@ import (
 	"github.com/SHREYAS-KS-CS104/shotDetect/templates"
 	"github.com/SHREYAS-KS-CS104/shotDetect/views"
 	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/csrf"
 )
 
 func executeTemplate(w http.ResponseWriter, filepath string) {
@@ -24,6 +25,7 @@ func executeTemplate(w http.ResponseWriter, filepath string) {
 
 func main() {
 	r := chi.NewRouter()
+
 	tpl := views.Must(views.ParseFS(templates.FS, "home.gohtml", "tailwind.gohtml"))
 	r.Get("/", controllers.StaticHandler(tpl))
 
@@ -60,12 +62,19 @@ func main() {
 	r.Post("/users", usersC.Create)
 	r.Get("/login", usersC.LogIn)
 	r.Post("/login", usersC.ProcessLogIn)
+	r.Get("/users/me", usersC.CurrentUser)
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Page not found", http.StatusNotFound)
 	})
 	fmt.Println("Starting the server on :3000...")
-	err = http.ListenAndServe(":3000", r)
+	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
+	csrfMw := csrf.Protect(
+		[]byte(csrfKey),
+		//TODO: Fix this before deploying
+		csrf.Secure(false),
+	)
+	err = http.ListenAndServe(":3000", csrfMw(r))
 	if err != nil {
 		panic(err)
 	}
