@@ -66,6 +66,7 @@ func main() {
 	r.Post("/users", usersC.Create)
 	r.Get("/login", usersC.LogIn)
 	r.Post("/login", usersC.ProcessLogIn)
+	r.Post("/logout", usersC.ProcessLogOut)
 	r.Get("/users/me", usersC.CurrentUser)
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
