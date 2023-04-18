@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/SHREYAS-KS-CS104/shotDetect/controllers"
+	"github.com/SHREYAS-KS-CS104/shotDetect/migrations"
 	"github.com/SHREYAS-KS-CS104/shotDetect/models"
 	"github.com/SHREYAS-KS-CS104/shotDetect/templates"
 	"github.com/SHREYAS-KS-CS104/shotDetect/views"
@@ -43,7 +44,7 @@ func main() {
 	}
 	defer db.Close()
 
-	err = models.Migrate(db, "migrations")
+	err = models.MigrateFS(db, migrations.FS, ".")
 	if err != nil {
 		panic(err)
 	}
