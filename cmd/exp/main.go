@@ -2,25 +2,35 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strconv"
 
 	"github.com/SHREYAS-KS-CS104/shotDetect/models"
-)
-
-const (
-	host     = "sandbox.smtp.mailtrap.io"
-	port     = 587
-	username = "02228f02835c1f"
-	password = "760d9e9c5203a6"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	host := os.Getenv("SMTP_HOST")
+	postStr := os.Getenv("SMTP_PORT")
+	port, err := strconv.Atoi(postStr)
+	if err != nil {
+		panic(err)
+	}
+	username := os.Getenv("SMTP_USERNAME")
+	password := os.Getenv("SMTP_PASSWORD")
+
 	es := models.NewEmailService(models.SMTPConfig{
 		Host:     host,
 		Port:     port,
 		Username: username,
 		Password: password,
 	})
-	err := es.ForgotPassword("shreyasks.cs18@bmsce.ac.in", "https://shreyas.com/rest-pw?")
+	err = es.ForgotPassword("shreyasks.cs18@bmsce.ac.in", "https://shreyas.com/rest-pw?")
 	if err != nil {
 		panic(err)
 	}
