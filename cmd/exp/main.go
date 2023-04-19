@@ -3,10 +3,34 @@ package main
 import (
 	"fmt"
 
+	stdctx "context"
+
+	"github.com/SHREYAS-KS-CS104/shotDetect/context"
 	"github.com/SHREYAS-KS-CS104/shotDetect/models"
 )
 
+type ctxKey string
+
+const (
+	favoriteColorKey ctxKey = "favorite-color"
+)
+
 func main() {
+	ctx := stdctx.Background()
+
+	user := models.User{
+		Email: "shreyasks.cs18@bmsce.ac.in",
+	}
+
+	ctx = context.WithUser(ctx, &user)
+
+	retrievedUser := context.User(ctx)
+
+	fmt.Println(retrievedUser.Email)
+}
+
+/*
+
 	cfg := models.DefaultPostgresConfig()
 	db, err := models.Open(cfg)
 	if err != nil {
@@ -31,7 +55,7 @@ func main() {
 	fmt.Println(user)
 }
 
-/*
+
 	// Create a table...
 	_, err = db.Exec(`
 	CREATE TABLE IF NOT EXISTS users (
@@ -51,9 +75,9 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("Tables created.")
-*/
 
-/*
+
+
 	// Insert some data..
 	name := "Shrey DAMN"
 	email := "shreyDamn@shrey.com"
@@ -68,8 +92,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("User created! id =", id)
-*/
-/*
+
 	id := 1
 	row := db.QueryRow(`
 		SELECT name, email
@@ -94,9 +117,9 @@ func main() {
 		}
 	}
 	fmt.Println("Created fake orders")
-*/
 
-/*
+
+
 	type Order struct {
 		ID          int
 		UserID      int
