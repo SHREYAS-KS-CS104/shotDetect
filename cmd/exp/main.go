@@ -1,32 +1,27 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
-	stdctx "context"
-
-	"github.com/SHREYAS-KS-CS104/shotDetect/context"
-	"github.com/SHREYAS-KS-CS104/shotDetect/models"
-)
-
-type ctxKey string
-
-const (
-	favoriteColorKey ctxKey = "favorite-color"
+	"github.com/go-mail/mail/v2"
 )
 
 func main() {
-	ctx := stdctx.Background()
+	from := "test@shotdetect.in"
+	to := "shreyasks.cs18@bmsce.ac.in"
+	subject := "This is a test mail"
+	plaintext := "This is the body of the mail"
+	html := `<h1>Hello there buddy!</h1><p>This is shreyas</p><p>Hope you have a nice day</p> `
 
-	user := models.User{
-		Email: "shreyasks.cs18@bmsce.ac.in",
-	}
+	msg := mail.NewMessage()
+	msg.SetHeader("To", to)
+	msg.SetHeader("From", from)
+	msg.SetHeader("subject", subject)
+	msg.SetBody("text/plain", plaintext)
+	msg.AddAlternative("text/html", html)
 
-	ctx = context.WithUser(ctx, &user)
+	msg.WriteTo(os.Stdout)
 
-	retrievedUser := context.User(ctx)
-
-	fmt.Println(retrievedUser.Email)
 }
 
 /*
