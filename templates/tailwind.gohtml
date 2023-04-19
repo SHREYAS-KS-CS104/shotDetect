@@ -17,15 +17,17 @@
                 <a class="text-lg font-normal hover:text-gray-500 pr-8" href="/faq">FAQ</a>
             </div>
             <div class="pl-6">
-            {{/*TODO: Sign out link */}}
+            {{if currentUser}}
             <form action="/logout" method="post" class="inline pr-4">
                 <div class="hidden">
                     {{csrfField}}
                 </div>
                 <button type="submit">Log out</button>
             </form>
+            {{else}}
             <a class="pr-4 text-lg hover:text-gray-500 text-black " href="/login">Log in</a>
             <a class="px-5 py-3 font-normal bg-indigo-600 font-semibold hover:bg-indigo-700 rounded text-white" href="/signup"> Sign up</a>
+            {{end}}
             </div>
         </nav>
     </header>
