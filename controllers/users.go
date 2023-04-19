@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/SHREYAS-KS-CS104/shotDetect/context"
 	"github.com/SHREYAS-KS-CS104/shotDetect/models"
 )
 
@@ -77,20 +78,28 @@ func (u Users) ProcessLogIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
-	token, err := readCookie(r, CookieSession)
-	if err != nil {
-		fmt.Println(err)
+	user := context.User(r.Context())
+	if user == nil {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
+	fmt.Fprintf(w, "Current user: %s\n", user.Email)
+	/*
+		token, err := readCookie(r, CookieSession)
+		if err != nil {
+			fmt.Println(err)
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
 
-	user, err := u.SessionService.User(token)
-	if err != nil {
-		fmt.Println(err)
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	}
-	fmt.Fprintf(w, "Current user %s\n", user.Email)
+		user, err := u.SessionService.User(token)
+		if err != nil {
+			fmt.Println(err)
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+		fmt.Fprintf(w, "Current user %s\n", user.Email)
+	*/
 }
 
 func (u Users) ProcessLogOut(w http.ResponseWriter, r *http.Request) {
