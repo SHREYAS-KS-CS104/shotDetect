@@ -14,21 +14,13 @@ const (
 )
 
 func main() {
-	email := models.Email{
-		From:      "test@shotdetect.in",
-		To:        "shreyasks.cs18@bmsce.ac.in",
-		Subject:   "This is a test mail",
-		Plaintext: "This is the body of the mail",
-		HTML:      `<h1>Hello there buddy!</h1><p>This is shreyas</p><p>Hope you have a nice day</p> `,
-	}
-
 	es := models.NewEmailService(models.SMTPConfig{
 		Host:     host,
 		Port:     port,
 		Username: username,
 		Password: password,
 	})
-	err := es.Send(email)
+	err := es.ForgotPassword("shreyasks.cs18@bmsce.ac.in", "https://shreyas.com/rest-pw?")
 	if err != nil {
 		panic(err)
 	}
