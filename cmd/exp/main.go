@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/go-mail/mail/v2"
+	"github.com/SHREYAS-KS-CS104/shotDetect/models"
 )
 
 const (
@@ -15,12 +14,28 @@ const (
 )
 
 func main() {
-	from := "test@shotdetect.in"
-	to := "shreyasks.cs18@bmsce.ac.in"
-	subject := "This is a test mail"
-	plaintext := "This is the body of the mail"
-	html := `<h1>Hello there buddy!</h1><p>This is shreyas</p><p>Hope you have a nice day</p> `
+	email := models.Email{
+		From:      "test@shotdetect.in",
+		To:        "shreyasks.cs18@bmsce.ac.in",
+		Subject:   "This is a test mail",
+		Plaintext: "This is the body of the mail",
+		HTML:      `<h1>Hello there buddy!</h1><p>This is shreyas</p><p>Hope you have a nice day</p> `,
+	}
 
+	es := models.NewEmailService(models.SMTPConfig{
+		Host:     host,
+		Port:     port,
+		Username: username,
+		Password: password,
+	})
+	err := es.Send(email)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Email sent")
+}
+
+/*
 	msg := mail.NewMessage()
 	msg.SetHeader("To", to)
 	msg.SetHeader("From", from)
@@ -36,7 +51,7 @@ func main() {
 	}
 	fmt.Println("Message sent")
 }
-
+*/
 /*
 
 	cfg := models.DefaultPostgresConfig()
