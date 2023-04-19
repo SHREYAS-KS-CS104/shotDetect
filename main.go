@@ -13,29 +13,8 @@ import (
 	"github.com/gorilla/csrf"
 )
 
-/*
-	func executeTemplate(w http.ResponseWriter, filepath string) {
-		t, err := views.Parse(filepath)
-		if err != nil {
-			log.Printf("parsing templates: %v", err)
-			http.Error(w, "There was an error parsing the template", http.StatusInternalServerError)
-			return
-		}
-		t.Execute(w, r, nil)
-	}
-*/
 func main() {
-	r := chi.NewRouter()
-
-	tpl := views.Must(views.ParseFS(templates.FS, "home.gohtml", "tailwind.gohtml"))
-	r.Get("/", controllers.StaticHandler(tpl))
-
-	tpl = views.Must(views.ParseFS(templates.FS, "contact.gohtml", "tailwind.gohtml"))
-	r.Get("/contact", controllers.StaticHandler(tpl))
-
-	tpl = views.Must(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml"))
-	r.Get("/faq", controllers.FAQ(tpl))
-
+	// Setup the Database
 	cfg := models.DefaultPostgresConfig()
 	fmt.Println(cfg.String())
 	db, err := models.Open(cfg)
@@ -48,6 +27,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// Setup services
 	userService := models.UserService{
 		DB: db,
 	}
@@ -55,30 +36,7 @@ func main() {
 		DB: db,
 	}
 
-	usersC := controllers.Users{
-		UserService:    &userService,
-		SessionService: &sessionService,
-	}
-	usersC.Templates.New = views.Must(views.ParseFS(
-		templates.FS,
-		"signup.gohtml", "tailwind.gohtml",
-	))
-
-	usersC.Templates.LogIn = views.Must(views.ParseFS(
-		templates.FS,
-		"login.gohtml", "tailwind.gohtml",
-	))
-	r.Get("/signup", usersC.New)
-	r.Post("/users", usersC.Create)
-	r.Get("/login", usersC.LogIn)
-	r.Post("/login", usersC.ProcessLogIn)
-	r.Post("/logout", usersC.ProcessLogOut)
-	r.Get("/users/me", usersC.CurrentUser)
-
-	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "Page not found", http.StatusNotFound)
-	})
-
+	//Setup Middleware
 	umw := controllers.UserMiddleware{
 		SessionService: &sessionService,
 	}
@@ -89,6 +47,50 @@ func main() {
 		//TODO: Fix this before deploying
 		csrf.Secure(false),
 	)
+
+	//Setup Controllers
+	usersC := controllers.Users{
+		UserService:    &userService,
+		SessionService: &sessionService,
+	}
+	usersC.Templates.New = views.Must(views.ParseFS(
+		templates.FS,
+		"signup.gohtml", "tailwind.gohtml",
+	))
+	usersC.Templates.LogIn = views.Must(views.ParseFS(
+		templates.FS,
+		"login.gohtml", "tailwind.gohtml",
+	))
+
+	//Setup our router and routes
+
+	r := chi.NewRouter()
+	r.Use(csrfMw)
+	r.Use(umw.SetUser)
+	tpl := views.Must(views.ParseFS(templates.FS, "home.gohtml", "tailwind.gohtml"))
+	r.Get("/", controllers.StaticHandler(tpl))
+	tpl = views.Must(views.ParseFS(templates.FS, "contact.gohtml", "tailwind.gohtml"))
+	r.Get("/contact", controllers.StaticHandler(tpl))
+	tpl = views.Must(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml"))
+	r.Get("/faq", controllers.FAQ(tpl))
+	r.Get("/signup", usersC.New)
+	r.Post("/users", usersC.Create)
+	r.Get("/login", usersC.LogIn)
+	r.Post("/login", usersC.ProcessLogIn)
+	r.Post("/logout", usersC.ProcessLogOut)
+	r.Route("/users/me", func(r chi.Router) {
+		r.Use(umw.RequireUser)
+		r.Get("/", usersC.CurrentUser)
+		r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprint(w, "Hello")
+		})
+	})
+	//r.Get("/users/me", usersC.CurrentUser)
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Page not found", http.StatusNotFound)
+	})
+
+	//Start the server
 	fmt.Println("Starting the server on :3000...")
-	http.ListenAndServe(":3000", csrfMw(umw.SetUser(r)))
+	http.ListenAndServe(":3000", r)
 }
