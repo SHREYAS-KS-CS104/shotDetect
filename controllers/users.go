@@ -142,9 +142,9 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 func (u Users) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var data struct {
-		Email string
+		Token string
 	}
-	data.Email = r.FormValue("email")
+	data.Token = r.FormValue("token")
 	u.Templates.ResetPassword.Execute(w, r, data)
 }
 
